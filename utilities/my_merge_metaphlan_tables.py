@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+# THIS IS A CUSTOM MODIFICATION THAT LET"S US GET OUT COUNTS INSTEAD OF RELATIVE ABUNDANCE
+# my_merge_metaphlan_tables.py --key estimated_number_of_reads_from_the_clade Table1.txt Table2.txt
+# old behaivor: my_merge_metaphlan_tables.py --key relative abundance Table1.txt Table2.txt
+
 # ==============================================================================
 # Merge script: from MetaPhlAn output on single sample to a joined "clades vs samples" table
 # Authors: Timothy Tickle (ttickle@hsph.harvard.edu) and Curtis Huttenhower (chuttenh@hsph.harvard.edu)
@@ -11,7 +15,7 @@ import os
 import sys
 
 
-def merge( aaastrIn, astrLabels, iCol, ostm ):
+def merge( aaastrIn, astrLabels, iCol, ostm, key = "estimated_number_of_reads_from_the_clade" ):
     """
     Outputs the table join of the given pre-split string collection.
 
@@ -52,7 +56,7 @@ def merge( aaastrIn, astrLabels, iCol, ostm ):
             # For a line in the file
             for astrLine in iIn:
                 if astrLine[0].startswith('#'):
-                    dCol = astrLine.index('relative_abundance') if 'relative_abundance' in astrLine else None
+                    dCol = astrLine.index(key) if key in astrLine else None
                     continue
 
                 iLine += 1
@@ -94,6 +98,8 @@ def merge( aaastrIn, astrLabels, iCol, ostm ):
 
 argp = argparse.ArgumentParser( prog = "merge_metaphlan_tables.py",
     description = """Performs a table join on one or more metaphlan output files.""")
+argp.add_argument( "--key", default="estimated_number_of_reads_from_the_clade" , # THIS IS THE CUSTOM CHANGE HERE THAT LET"S US GET OUT COUNTS INSTEAD OF RELATIVE ABUNDANCE
+    help = "One or more tab-delimited text tables to join" )
 argp.add_argument( "aistms",    metavar = "input.txt", nargs = "+",
     help = "One or more tab-delimited text tables to join" )
 
@@ -104,7 +110,7 @@ argp.usage = argp.format_usage()[7:]+"\n\n\tPlease make sure to supply file path
 
 def _main( ):
     args = argp.parse_args( )
-    merge(args.aistms, [os.path.split(os.path.basename(f))[1] for f in args.aistms], 0, sys.stdout)
+    merge(args.aistms, [os.path.split(os.path.basename(f))[1] for f in args.aistms], 0, sys.stdout, key = args.key)
 
 
 if __name__ == "__main__":
