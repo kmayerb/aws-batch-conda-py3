@@ -1,4 +1,4 @@
-FROM continuumio/anaconda3:201
+FROM continuumio/anaconda3:2019.10
 
 COPY environment.yml .
 
